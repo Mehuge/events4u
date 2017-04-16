@@ -6,7 +6,7 @@
  * @Author: Mehuge (mehuge@sorcerer.co.uk)
  * @Date: 2017-04-16 19:53:47
  * @Last Modified by: Mehuge (mehuge@sorcerer.co.uk)
- * @Last Modified time: 2017-04-16 23:46:12
+ * @Last Modified time: 2017-04-17 00:31:16
  */
 
 let internalId = 0;
@@ -27,6 +27,11 @@ class Listener {
   }
 }
 
+interface Topic {
+  count: number;
+  listeners: Listener[];
+}
+
 class EventEmitter {
   private events: any;
   constructor() {
@@ -41,7 +46,8 @@ class EventEmitter {
    * @param callback {function}    Handler to call when topic is fired
    */
   public addListener(topic: string, once: boolean = false, callback: (...params: any[]) => void): any {
-    const listeners: Listener[] = this.events[topic] = this.events[topic] || [];
+    const T: Topic = this.events[topic] = this.events[topic] || { count: 0, listeners: [] };
+    const listeners: Listener[] = T.listeners;
     const listener: Listener = new Listener(topic, once, callback);
     const i: number = listeners.indexOf(null);
     if (i === -1) {
@@ -49,6 +55,7 @@ class EventEmitter {
     } else {
       listeners[i] = listener;
     }
+    T.count ++;
     return listener;
   }
 
@@ -87,13 +94,15 @@ class EventEmitter {
    */
   public removeListener(listener: any): void {
     if (!listener.dead) {
-      const listeners: Listener[] = this.events[listener.topic];
-      if (listeners && listeners.length) {
-        for (let i = 0; i < listeners.length; i++) {
-          if (listeners[i] && listeners[i].id === listener.id) {
-            listeners[i].dead = Date.now();
-            listeners[i] = null;
-            return;
+      const T: Topic = this.events[listener.topic];
+      if (T) {
+        const listeners: Listener[] = T.listeners;
+        if (listeners && listeners.length) {
+          for (let i = 0; i < listeners.length; i++) {
+            if (listeners[i] && listeners[i].id === listener.id) {
+              this._killListener(listeners, i);
+              return;
+            }
           }
         }
       }
@@ -109,6 +118,20 @@ class EventEmitter {
     this.removeListener(listener);
   }
 
+  /* Called to kill a listener, and garbage collect */
+  private _killListener(listeners: Listener[], i: number) {
+    const listener = listeners[i];
+    if (listener) {
+      const T: Topic = this.events[listener.topic];
+      listener.dead = Date.now();
+      T.count --;
+      if (T.count === 0) {
+        this.events[listener.topic] = null;
+      }
+    }
+    listeners[i] = null;
+  }
+
   /**
    * emit() is called to pass the supplied data to the registered handlers for the topic
    *
@@ -116,17 +139,20 @@ class EventEmitter {
    * @param data {any}  The data being passed (depends on topic)
    */
   public emit(topic: string, ...params: any[]): void {
-    const listeners: Listener[] = this.events[topic];
-    if (listeners && listeners.length) {
-      for (let i = 0; i < listeners.length; i++) {
-        if (listeners[i]) {
-          const listener: Listener = listeners[i];
-          if (listener.once) {
-            listeners[i] = null;
+    const T: Topic = this.events[topic];
+    if (T) {
+      const listeners: Listener[] = T.listeners;
+      if (listeners && listeners.length) {
+        for (let i = 0; i < listeners.length; i++) {
+          if (listeners[i]) {
+            const listener: Listener = listeners[i];
+            if (listener.once) {
+              this._killListener(listeners, i);
+            }
+            listener.last = Date.now();
+            listener.fired++;
+            listener.callback(...params);
           }
-          listener.last = Date.now();
-          listener.fired++;
-          listener.callback(...params);
         }
       }
     }
@@ -145,25 +171,53 @@ class EventEmitter {
   public diagnostics = () : void => {
     for (const key in this.events) {
       if (this.events.hasOwnProperty(key)) {
-        const listeners : Listener[] = this.events[key];
-        listeners.forEach((listener: Listener, index: number) : void => {
-          if (listener) {
-            console.log(
-              'Event:'
-              + ' topic ' + listener.topic
-              + ' index ' + index
-              + ' ID ' + listener.id
-              + ' once ' + listener.once
-              + ' callback ' + typeof(listener.callback)
-              + ' fired ' + listener.fired
-              + ' last ' + (new Date(listener.last)).toISOString(),
-            );
-          } else {
-            console.log('Event: topic ' + key + ' Index ' + index + ' is free (null)');
-          }
-        });
+        const T: Topic = this.events[key];
+        if (T) {
+          console.log('Topic ' + key + ' Listeners ' + T.count + ' Bucket ' + T.listeners.length)
+          const listeners : Listener[] = T.listeners;
+          listeners.forEach((listener: Listener, index: number) : void => {
+            if (listener) {
+              console.log(
+                'Listener:'
+                + ' topic ' + listener.topic
+                + ' index ' + index
+                + ' ID ' + listener.id
+                + ' once ' + listener.once
+                + ' callback ' + typeof(listener.callback)
+                + ' fired ' + listener.fired
+                + ' last ' + (new Date(listener.last)).toISOString(),
+              );
+            } else {
+              console.log('Listener: topic ' + key + ' Index ' + index + ' is free (null)');
+            }
+          });
+        }
       }
     }
+  }
+
+  /**
+   * Garbage collect.
+   * Cleans up internal data structure removing unused entries.
+   */
+  public gc(): void {
+    const events: any = {};
+    for (const key in this.events) {
+      if (this.events.hasOwnProperty(key)) {
+        const topic: Topic = this.events[key];
+        if (topic) {
+          events[key] = topic;
+          if (topic.count < topic.listeners.length) {
+            const listeners: Listener[] = [];
+            topic.listeners.map((value: Listener) => {
+              if (value) listeners.push(value);
+            });
+            topic.listeners = listeners;
+          }
+        }
+      }
+    }
+    this.events = events;
   }
 }
 

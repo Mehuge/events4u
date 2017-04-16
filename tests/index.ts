@@ -51,7 +51,7 @@ function assert(test: boolean, message: string) {
     events.emit('test-event', 'hello world');
     events.emit('test-event', 'abc');
     events.emit('test-event', 123);
-    events.off(listener);
+    events.off(listener);   // it's a once, already removed so this is a no-op
     assert(result === 'hello world', 'event did not fire properly, result=' + result);
     assert(count === 1, 'event fired incorrect number of times count=' + count);
   }
@@ -120,6 +120,30 @@ function assert(test: boolean, message: string) {
     events.off(listener1);    // no-op
     events.fire('test-event');  // no-op
     done();
+  }
+
+  @test('garbage collection')
+  garbage_collection(done: Function) {
+
+    for (let i = 0; i < 3; i++) {
+      const listener1 = events.on('test-event', () => {});
+      const listener2 = events.on('test-event', () => {});
+      const listener3 = events.on('other-event', () => {});
+      events.gc();
+      events.off(listener1);
+      events.gc();
+      events.off(listener2);
+      events.off(listener3);
+      events.gc();
+      events.emit('test-event');
+    }
+
+    done();
+  }
+
+  static after() {
+    // should produce no output
+    events.diagnostics();
   }
 
 }
