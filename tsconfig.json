@@ -1,0 +1,40 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "target": "es6",
+        "noImplicitAny": true,
+        "removeComments": false,
+        "outDir": "./build/lib",
+        "sourceMap": false,
+        "jsx": "react",
+        "module": "commonjs",
+        "declaration": true,
+        "newLine": "LF"
+    },
+    "formatCodeOptions": {
+        "indentSize": 2,
+        "tabSize": 2,
+        "newLineCharacter": "\r\n",
+        "convertTabsToSpaces": true,
+        "insertSpaceAfterCommaDelimiter": true,
+        "insertSpaceAfterSemicolonInForStatements": true,
+        "insertSpaceBeforeAndAfterBinaryOperators": true,
+        "insertSpaceAfterKeywordsInControlFlowStatements": true,
+        "insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+        "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+        "placeOpenBraceOnNewLineForFunctions": false,
+        "placeOpenBraceOnNewLineForControlBlocks": false
+    },
+    "compileOnSave": false,
+    "buildOnSave": false,
+    "resolution": "typings",
+    "moduleResolution": "node",
+    "exclude": [
+      "tests",
+      "tmp",
+      "tmpp",
+      "dist",
+      "publish",
+      "node_modules"
+    ]
+}
