@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceRoot}/tests/build/index.js",
+      "program": "${workspaceRoot}/tests/build/tests/debug.js",
       "outFiles": []
     },
     {

@@ -30,6 +30,7 @@
     "resolution": "typings",
     "moduleResolution": "node",
     "files": [
-      "tests/index.ts"
+      "tests/index.ts",
+      "tests/debug.ts"
     ]
 }

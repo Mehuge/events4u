@@ -1,8 +1,6 @@
 import events, { EventEmitter } from '../src';
 import { suite, test, slow, timeout, skip, only } from "mocha-typescript";
 
-let listener1, listener2, listener3;
-
 function assert(test: boolean, message: string) {
   if (!test) throw new Error(message);
 }
@@ -77,4 +75,51 @@ function assert(test: boolean, message: string) {
     assert(result === 'hello world', 'event did not fire properly, result=' + result);
     assert(count === 7, 'event fired incorrect number of times count=' + count);
   }
+
+  @test('once')
+  once(done: Function) {
+    events.once('test-event', () => {
+      done();
+    });
+    events.emit('test-event');
+    events.emit('test-event');
+  }
+
+  @test('Private Event Emitter')
+  private_emitter(done: Function) {
+    const listener1 = events.on('test-event', () => {
+      done(new Error('global emitter called for private event'));
+    });
+    const myEvents = new EventEmitter();
+    myEvents.once('test-event', () => {
+      done();
+    });
+    myEvents.emit('test-event');
+    events.off(listener1);
+  }
+
+  @test('off inside on')
+  off_inside_on(done: Function) {
+    const listener1 = events.on('test-event', () => {
+      events.off(listener1);
+      assert(listener1.dead, "listener should be dead now");
+      done();   // should only be called once
+    });
+    events.emit('test-event');
+    events.emit('test-event');
+    events.emit('test-event');
+  }
+
+  @test('dead listener')
+  dead_listener(done: Function) {
+    const listener1 = events.on('test-event', () => {
+      done(new Error('should not be called'));
+    });
+    events.off(listener1);
+    assert(listener1.dead, "listener should be dead now");
+    events.off(listener1);    // no-op
+    events.fire('test-event');  // no-op
+    done();
+  }
+
 }
