@@ -6,7 +6,7 @@
  * @Author: Mehuge (mehuge@sorcerer.co.uk)
  * @Date: 2017-04-16 19:53:47
  * @Last Modified by: Mehuge (mehuge@sorcerer.co.uk)
- * @Last Modified time: 2017-04-16 20:38:03
+ * @Last Modified time: 2017-04-16 23:46:12
  */
 
 let internalId = 0;
@@ -18,6 +18,7 @@ class Listener {
   public callback: (...params: any[]) => void;
   public fired: number = 0;
   public last: number = 0;
+  public dead: number = 0;
   constructor(topic: string, once: boolean, callback: (...params: any[]) => void) {
     this.topic = topic;
     this.once = once;
@@ -85,12 +86,15 @@ class EventEmitter {
    * @param listener {any}   Handle returned by previous call to addListener()
    */
   public removeListener(listener: any): void {
-    const listeners: Listener[] = this.events[listener.topic];
-    if (listeners && listeners.length) {
-      for (let i = 0; i < listeners.length; i++) {
-        if (listeners[i] && listeners[i].id === listener.id) {
-          listeners[i] = null;
-          return;
+    if (!listener.dead) {
+      const listeners: Listener[] = this.events[listener.topic];
+      if (listeners && listeners.length) {
+        for (let i = 0; i < listeners.length; i++) {
+          if (listeners[i] && listeners[i].id === listener.id) {
+            listeners[i].dead = Date.now();
+            listeners[i] = null;
+            return;
+          }
         }
       }
     }
