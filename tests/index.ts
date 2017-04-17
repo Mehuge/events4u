@@ -141,6 +141,19 @@ function assert(test: boolean, message: string) {
     done();
   }
 
+  @test('Read Me Example 1')
+  readme_ex1() {
+    let count = 0;
+    const handler = events.on('test-event', (...args) => {
+      ++count;
+    });
+    events.fire('test-event', 1);
+    events.fire('test-event', 1, 2);
+    events.fire('test-event', 1, 2, 3);
+    events.off(handler);
+    assert(count === 3, 'event count ' + count + ' is not 3');
+  }
+
   static after() {
     // should produce no output
     events.diagnostics();

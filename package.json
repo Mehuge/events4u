@@ -1,26 +1,26 @@
 {
   "name": "eventsjs",
-  "version": "1.0.0",
-  "description": "Event Emitter for JavaScript",
+  "version": "0.1.0",
+  "description": "Event Emitter for JavaScript/TypeScript",
   "main": "index.js",
   "directories": {
     "test": "tests"
   },
   "dependencies": {},
   "devDependencies": {
-    "mocha": "^3.2.0",
-    "mocha-typescript": "^1.0.23",
     "rimrf": "^2.6.1",
-    "typescript": "^2.2.2"
+    "typescript": "^2.2.2",
+    "mocha": "^3.2.0",
+    "mocha-typescript": "^1.0.23"
   },
   "scripts": {
     "clean-lib": "rimraf build",
     "build-lib": "npm run clean-lib && tsc",
     "clean-tests": "rimraf tests/build",
     "build-tests": "npm run clean-tests && tsc -p tsconfig.test.json",
-    "test": "mocha tests/build/tests/index.js",
-    "build": "npm run build-lib && npm run tests",
-    "tests": "npm run build-tests && npm run test"
+    "tests": "mocha tests/build/tests/index.js",
+    "build": "npm run build-lib && npm test",
+    "test": "npm run build-tests && npm run tests"
   },
   "repository": {
     "type": "git",
