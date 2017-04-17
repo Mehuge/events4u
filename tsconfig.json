@@ -4,7 +4,7 @@
         "target": "es6",
         "noImplicitAny": true,
         "removeComments": false,
-        "outDir": "./build/lib",
+        "outDir": "./tmp",
         "sourceMap": false,
         "jsx": "react",
         "module": "commonjs",
@@ -32,8 +32,9 @@
     "exclude": [
       "tests",
       "tmp",
+      "lib",
       "tmpp",
-      "dist",
+      "build",
       "publish",
       "node_modules"
     ]

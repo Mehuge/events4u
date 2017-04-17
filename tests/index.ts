@@ -5,7 +5,7 @@ function assert(test: boolean, message: string) {
   if (!test) throw new Error(message);
 }
 
-@suite class eventjs {
+@suite class events4u {
 
   @test("on, emit, off")
   on_emit_off() {

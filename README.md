@@ -5,7 +5,7 @@ A small but powerful event emitter for JavaScript and TypeScript
 
 ## Installation
 
-  ``npm i eventsjs --save``
+  ``npm i events4u --save``
 
 ## Basic Usage
 
@@ -28,5 +28,6 @@ A small but powerful event emitter for JavaScript and TypeScript
 
 ## Release History
 
+* 0.1.1 Initial module release
 * 0.1.0 Initial release
 

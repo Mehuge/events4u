@@ -1,26 +1,31 @@
 {
-  "name": "eventsjs",
-  "version": "0.1.0",
-  "description": "Event Emitter for JavaScript/TypeScript",
-  "main": "index.js",
+  "name": "events4u",
+  "version": "0.1.1",
+  "description": "A simple Event Emitter for JavaScript and TypeScript",
+  "main": "lib\\index.ts",
   "directories": {
     "test": "tests"
   },
   "dependencies": {},
   "devDependencies": {
-    "rimrf": "^2.6.1",
-    "typescript": "^2.2.2",
+    "babel-cli": "^6.24.1",
     "mocha": "^3.2.0",
-    "mocha-typescript": "^1.0.23"
+    "mocha-typescript": "^1.0.23",
+    "rimrf": "^2.6.1",
+    "typescript": "^2.2.2"
   },
   "scripts": {
-    "clean-lib": "rimraf build",
-    "build-lib": "npm run clean-lib && tsc",
+    "clean-tmp": "rimraf tmp tmpp",
+    "build-lib": "npm run clean-tmp && tsc && npm run babel && npm run browserify",
     "clean-tests": "rimraf tests/build",
     "build-tests": "npm run clean-tests && tsc -p tsconfig.test.json",
     "tests": "mocha tests/build/tests/index.js",
     "build": "npm run build-lib && npm test",
-    "test": "npm run build-tests && npm run tests"
+    "test": "npm run build-tests && npm run tests",
+    "babel": "babel tmp -d tmpp",
+    "browserify": "browserify tmpp/index.js > lib/events4u.js && npm run browserify-post",
+    "copy": "copy src\\*.ts lib && copy tmp\\*.d.ts lib",
+    "browserify-post": "npm run copy && npm run clean-tmp"
   },
   "repository": {
     "type": "git",
