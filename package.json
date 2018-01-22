@@ -1,7 +1,7 @@
 {
   "name": "events4u",
-  "version": "0.1.1",
-  "description": "A simple Event Emitter for JavaScript and TypeScript",
+  "version": "0.1.2",
+  "description": "Deprecated, use elvjs instead",
   "main": "lib\\index.ts",
   "directories": {
     "test": "tests"
